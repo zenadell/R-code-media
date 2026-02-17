@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R-code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <section>
+        <div class="contentHolder">
+            <!-- ================ SIDEBAR ============= -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <h1>R-Code <span>Media</span></h1>
+                        <div class="menu">
+                            <ion-icon name="menu"></ion-icon>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-content">
+                    <form onsubmit="return false;">
+                        <div class="formGroup">
+                            <label>Target Audience / Company</label>
+                            <input type="text" id="company" placeholder="e.g. Acme Corp, Tech Startups...">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Campaign Focus</label>
+                            <input type="text" id="focus" placeholder="e.g. Product Launch, Brand Awareness...">
+                        </div>
+
+                        <div class="select">
+                            <label>Platform DNA</label>
+                            <select id="platform">
+                                <option value="LinkedIn">LinkedIn (Professional)</option>
+                                <option value="Instagram">Instagram (Social)</option>
+                                <option value="X">X (Realtime)</option>
+                            </select>
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Duration (Days)</label>
+                            <input type="number" id="days" placeholder="e.g. 7" value="7">
+                        </div>
+
+                        <div class="select">
+                            <label>Content Depth</label>
+                            <select id="length">
+                                <option value="Short">Short & Punchy</option>
+                                <option value="Medium" selected>Balanced</option>
+                                <option value="Long">Detailed / Deep</option>
+                            </select>
+                        </div>
+
+                        <div class="select">
+                            <label>Model Engine</label>
+                            <select id="model">
+                                <option value="gemini-2.5-flash">Chaka v2.5 (Fast)</option>
+                                <option value="gemini-2.5-thinking-exp">Chaka Thought (Thinking)</option>
+                                <option value="gemini-2.5-pro">Chaka v2.5 (Smart)</option>
+                            </select>
+                        </div>
+                        <div class="btn">
+                            <button type="button" class="btn-generate" id="generate-btn">Initialize Strategy</button>
+                        </div>
+                    </form>
+
+                    <div class="recentHolder">
+                        <div class="recent">
+                            <h3>Recent Strategies 🕒</h3>
+                        </div>
+                        <div class="medias" id="history-list">
+                            <!-- History items will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <button type="button" id="export-sql-btn">💾 Export SQL</button>
+                    <p>Powered by R-Code Media</p>
+                </div>
+            </div>
+
+            <!-- ================ MAIN CONTENT ============= -->
+            <div class="mainside">
+                <div class="outPutCard initial-state">
+                    <div id="virality-badge"></div>
+                    <div class="outPutMessage" id="output">
+                        <p class="lead">✨ Ready to generate.</p>
+                        <p>Configure your strategy on the left and initialize the engine.</p>
+                    </div>
+                </div>
+                <div class="promptBar">
+                    <input type="text" id="chat-input" placeholder="Ask Chaka or select text to rework...">
+                    <button type="button" id="send-chat-btn"><ion-icon name="send"></ion-icon></button>
+                </div>
+                <!-- Chat messages can be displayed in the output area or a separate hidden div -->
+                <div id="chat-messages" style="display:none;"></div>
+            </div>
+
+            <!-- ================ ACTIVE SOURCE ============= -->
+            <div class="activeSource">
+                <div class="close">
+                    <ion-icon name="close"></ion-icon>
+                </div>
+                <div class="intel">
+                    <h4>intelligence hub 🧠(dual core)</h4>
+                </div>
+
+                <div class="centered" id="sources-container">
+                    <p>Active research sources<br>will appear here...</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <button class="theme-switch" id="themeSwitch" type="button" aria-label="Toggle light and dark mode"
+        aria-pressed="false">
+        <span class="theme-switch-track"></span>
+        <span class="theme-switch-thumb"></span>
+        <span class="theme-switch-label"></span>
+    </button>
+
+    <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
