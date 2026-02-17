@@ -3,7 +3,8 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import FastAPI, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -110,6 +111,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static files (script.js, style.css) from the project root
+# Note: In production on Render, the root is /opt/render/project/src
+root_dir = Path(__file__).parent.parent
+app.mount("/static", StaticFiles(directory=str(root_dir)), name="static")
+
+@app.get("/")
+async def read_root():
+    return FileResponse(root_dir / "rcode.html")
 
 # -------- Web research (Async with Tavily + Serper) --------
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")

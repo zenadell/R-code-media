@@ -1,5 +1,5 @@
 // --- Constants ---
-const API_BASE = 'http://localhost:8001';
+const API_BASE = '';
 const HISTORY_KEY = 'rcode_history_v1';
 
 // --- UI Elements ---
