@@ -241,17 +241,33 @@ function handleImageSelect(e) {
   const reader = new FileReader();
   reader.onload = (event) => {
     selectedImageBase64 = event.target.result;
-    document.getElementById('image-preview').src = selectedImageBase64;
-    document.getElementById('image-preview-container').style.display = 'inline-block';
+
+    // Show preview
+    const preview = document.getElementById('image-preview');
+    const container = document.getElementById('image-preview-container');
+    if (preview) preview.src = selectedImageBase64;
+    if (container) container.style.display = 'block';
+
+    // Auto-switch model to vision
+    const modelSelect = document.getElementById('model');
+    if (modelSelect) {
+      modelSelect.value = 'chaka-image';
+      // Trigger change event if needed for other listeners
+      modelSelect.dispatchEvent(new Event('change'));
+    }
   };
   reader.readAsDataURL(file);
 }
 
 function clearImage() {
   selectedImageBase64 = null;
-  document.getElementById('image-input').value = "";
-  document.getElementById('image-preview').src = "";
-  document.getElementById('image-preview-container').style.display = 'none';
+  const imageInput = document.getElementById('image-input');
+  const preview = document.getElementById('image-preview');
+  const container = document.getElementById('image-preview-container');
+
+  if (imageInput) imageInput.value = "";
+  if (preview) preview.src = "";
+  if (container) container.style.display = 'none';
 }
 
 // --- Generation Logic ---
