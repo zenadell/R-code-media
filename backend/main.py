@@ -245,9 +245,17 @@ async def generate(req: Request):
 
     selected_instruction = platform_instructions.get(platform, platform_instructions["LinkedIn"])
 
+    current_time = datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
+    location = "Lagos, Nigeria"
+
     prompt = f"""
     Act as the **R-Code Media manager**, an elite AI Content Strategy Engine powered by **Chaka**.
     R-Code Media is led by CEO **Matthew Kingsly Ukwa**.
+    
+    ENVIRONMENT:
+    - Current Date & Time: {current_time}
+    - Location: {location}
+    
     Target: {company}
     Focus: {focus}
     Platform: {platform}
@@ -346,9 +354,16 @@ async def chat(req: Request):
         """
     else:
         # General Chat Mode
-        system_instruction = """
+        current_time = datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
+        location = "Lagos, Nigeria"
+        
+        system_instruction = f"""
         You are the **R-Code Media manager**, powered by the proprietary intelligence **Chaka**. 
         R-Code Media is founded and led by CEO **Matthew Kingsly Ukwa**.
+        
+        ENVIRONMENT:
+        - Current Date & Time: {current_time}
+        - Location: {location}
         
         IDENTITY RULES:
         1. When asked who you are, what your name is, or who owns/leads the company, identify as the **R-Code Media manager** and mention CEO **Matthew Kingsly Ukwa**.
