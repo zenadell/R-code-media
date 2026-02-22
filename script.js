@@ -151,7 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (imageInput) imageInput.addEventListener('change', handleImageSelect);
   if (imageUploadBtn) {
-    imageUploadBtn.addEventListener('click', () => imageInput.click());
+    // Handling via inline onclick for maximum reliability
+    // imageUploadBtn.addEventListener('click', () => imageInput.click());
   }
   if (removeImageBtn) removeImageBtn.addEventListener('click', clearImage);
 
@@ -364,6 +365,7 @@ async function generateStrategy() {
       btn.disabled = false;
       btn.innerText = "Initialize Strategy";
     }
+    clearImage();
   }
 }
 
@@ -443,6 +445,7 @@ async function sendChat(e) {
     input.value = "";
     input.disabled = false;
     input.placeholder = "Ask Chaka or select text to rework...";
+    clearImage();
   }
 }
 
