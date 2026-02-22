@@ -146,9 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Image Upload Logic
   const imageInput = document.getElementById('image-input');
+  const imageUploadBtn = document.getElementById('image-upload-btn');
   const removeImageBtn = document.getElementById('remove-image-btn');
 
   if (imageInput) imageInput.addEventListener('change', handleImageSelect);
+  if (imageUploadBtn) {
+    imageUploadBtn.addEventListener('click', () => imageInput.click());
+  }
   if (removeImageBtn) removeImageBtn.addEventListener('click', clearImage);
 
   renderHistory();

@@ -514,27 +514,37 @@ MAIN  CONTENT STYLES
 .promptBar {
     margin: 20px 0 10px 0;
     display: flex;
+    flex-direction: column;
+    /* Allow preview to stack above input */
     flex-shrink: 0;
-    gap: 10px;
+    gap: 15px;
     background: linear-gradient(135deg, #161E31 0%, #11192B 100%);
     border: 1px solid var(--border);
-    padding: 30px 10px 10px 10px;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 12px;
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.promptBar input {
-    width: 95%;
-    height: 40px;
+.prompt-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.promptBar input[type="text"] {
+    flex: 1;
+    /* Replace fixed width with flex */
+    height: 45px;
     background: #0A101E;
     border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0px 10px;
+    border-radius: 8px;
+    padding: 0px 15px;
     color: var(--text-color);
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     outline: none;
-    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .promptBar input::placeholder {
@@ -543,9 +553,10 @@ MAIN  CONTENT STYLES
     font-weight: 700;
 }
 
-.promptBar button {
-    height: 40px;
-    width: 6%;
+.promptBar button,
+.prompt-btn {
+    height: 45px;
+    min-width: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -553,12 +564,21 @@ MAIN  CONTENT STYLES
     border: none;
     color: #f4f7ff;
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 20px;
-    font-weight: 700;
     cursor: pointer;
-    text-transform: uppercase;
-    transition: transform 0.2s ease, filter 0.2s ease, background 0.3s ease;
+    transition: all 0.2s ease;
+}
+
+#image-upload-btn {
+    background: var(--sidebarColor);
+    border: 1px solid var(--border);
+    color: var(--text-color);
+}
+
+#image-upload-btn:hover {
+    background: var(--border);
+    color: white;
 }
 
 .promptBar button:hover {
