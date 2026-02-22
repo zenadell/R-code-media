@@ -8,6 +8,8 @@ let menuIcon = document.querySelector(".menu");
 let closeIcon = document.querySelector(".activeSource .close");
 let themeSwitch = document.getElementById("themeSwitch");
 let currentSelectionRange = null;
+let userLocation = null;
+let locationWatchId = null;
 
 // --- Sidebar/Menu Logic ---
 if (menuIcon && activeSource) {
@@ -136,8 +138,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const locationToggle = document.getElementById('location-toggle');
+  if (locationToggle) {
+    locationToggle.addEventListener('change', handleLocationToggle);
+  }
+
   renderHistory();
 });
+
+// --- Location Logic ---
+function handleLocationToggle(e) {
+  const statusDiv = document.getElementById('location-status');
+  if (e.target.checked) {
+    if ("geolocation" in navigator) {
+      statusDiv.innerText = "Requesting permission...";
+      locationWatchId = navigator.geolocation.watchPosition(
+        (position) => {
+          userLocation = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+          statusDiv.innerText = `Active: ${userLocation}`;
+          statusDiv.classList.add('active');
+          statusDiv.classList.remove('error');
+        },
+        (error) => {
+          console.error("Location error:", error);
+          userLocation = null;
+          e.target.checked = false;
+          statusDiv.innerText = "Error: Access Denied";
+          statusDiv.classList.add('error');
+          statusDiv.classList.remove('active');
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+      e.target.checked = false;
+    }
+  } else {
+    if (locationWatchId) {
+      navigator.geolocation.clearWatch(locationWatchId);
+      locationWatchId = null;
+    }
+    userLocation = null;
+    statusDiv.innerText = "Off";
+    statusDiv.classList.remove('active', 'error');
+  }
+}
 
 // --- Generation Logic ---
 async function generateStrategy() {
@@ -170,7 +215,7 @@ async function generateStrategy() {
     const response = await fetch(`${API_BASE}/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ company, focus, days, platform, model, length })
+      body: JSON.stringify({ company, focus, days, platform, model, length, user_location: userLocation })
     });
 
     const reader = response.body.getReader();
@@ -275,7 +320,7 @@ async function sendChat(e) {
     const response = await fetch(`${API_BASE}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ ...payload, user_location: userLocation })
     });
 
     const reader = response.body.getReader();

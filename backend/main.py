@@ -198,6 +198,7 @@ async def generate(req: Request):
     days = data.get("days", "3")
     length = data.get("length", "Medium")
     platform = data.get("platform", "LinkedIn")
+    user_location = data.get("user_location")
     # Default to user requested model, let SDK handle errors if invalid
     model_name = data.get("model", "gemini-2.5-flash")
 
@@ -246,7 +247,7 @@ async def generate(req: Request):
     selected_instruction = platform_instructions.get(platform, platform_instructions["LinkedIn"])
 
     current_time = datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
-    location = "Lagos, Nigeria"
+    location = user_location if user_location else "Lagos, Nigeria"
 
     prompt = f"""
     Act as the **R-Code Media manager**, an elite AI Content Strategy Engine powered by **Chaka**.
@@ -326,6 +327,7 @@ async def chat(req: Request):
     message = data.get("message", "")
     context = data.get("context", "") # Current document text
     selection = data.get("selection", "") # Selected text to rework
+    user_location = data.get("user_location")
     model_name = data.get("model", "gemini-2.5-flash")
     
     logger.info(f"Chat request: {message[:50]}... | Selection: {bool(selection)}")
@@ -355,7 +357,7 @@ async def chat(req: Request):
     else:
         # General Chat Mode
         current_time = datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
-        location = "Lagos, Nigeria"
+        location = user_location if user_location else "Lagos, Nigeria"
         
         system_instruction = f"""
         You are the **R-Code Media manager**, powered by the proprietary intelligence **Chaka**. 
