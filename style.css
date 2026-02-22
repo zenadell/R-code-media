@@ -515,14 +515,11 @@ MAIN  CONTENT STYLES
     margin: 20px 0 10px 0;
     display: flex;
     flex-direction: column;
-    /* Allow preview to stack above input */
-    flex-shrink: 0;
     gap: 15px;
     background: linear-gradient(135deg, #161E31 0%, #11192B 100%);
     border: 1px solid var(--border);
-    padding: 15px;
+    padding: 20px;
     border-radius: 12px;
-    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .prompt-input-wrapper {
@@ -534,46 +531,66 @@ MAIN  CONTENT STYLES
 
 .promptBar input[type="text"] {
     flex: 1;
-    /* Replace fixed width with flex */
-    height: 45px;
+    height: 44px;
     background: #0A101E;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 0px 15px;
+    padding: 0 15px;
     color: var(--text-color);
     font-size: 14px;
-    font-weight: 500;
     outline: none;
-    transition: all 0.3s ease;
-}
-
-.promptBar input::placeholder {
-    color: var(--placeHolderColor);
-    font-size: 12px;
-    font-weight: 700;
 }
 
 .promptBar button,
 .prompt-btn {
-    height: 45px;
-    min-width: 45px;
+    height: 44px;
+    width: 44px;
+    min-width: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--btnColor);
     border: none;
-    color: #f4f7ff;
-    padding: 10px;
+    color: white;
     border-radius: 8px;
     font-size: 20px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 #image-upload-btn {
     background: var(--sidebarColor);
     border: 1px solid var(--border);
     color: var(--text-color);
+}
+
+/* Image Preview Styles */
+.image-preview-container {
+    display: none;
+    padding: 8px;
+    background: var(--sidebarColor);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    position: relative;
+    max-width: 120px;
+}
+
+.image-preview-container img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+.remove-image-btn {
+    position: absolute !important;
+    top: -5px !important;
+    right: -5px !important;
+    background: #ff4757 !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    border-radius: 50% !important;
+    font-size: 12px !important;
+    padding: 0 !important;
 }
 
 #image-upload-btn:hover {
