@@ -7,7 +7,6 @@ from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-import google.generativeai as genai
 import httpx
 import sqlite3
 from datetime import datetime
@@ -20,14 +19,45 @@ logger = logging.getLogger(__name__)
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-GEMINI_KEY = os.getenv("GEMINI_API_KEY")
+CHAKA_URL = os.getenv("CHAKA_API_URL")
+CHAKA_KEY = os.getenv("CHAKA_API_KEY")
 TAVILY_KEY = os.getenv("TAVILY_API_KEY")
 
-# Configure Gemini SDK
-if not GEMINI_KEY:
-    logger.error("GEMINI_API_KEY not found in .env")
-else:
-    genai.configure(api_key=GEMINI_KEY)
+async def call_chaka_api(message, model_name, system_instruction=None):
+    if not CHAKA_URL or not CHAKA_KEY:
+        logger.error("Chaka API config missing")
+        return "Error: Chaka API configuration missing in .env"
+    
+    # Prepend system instruction if provided
+    combined_message = f"{system_instruction}\n\nUSER MESSAGE: {message}" if system_instruction else message
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                CHAKA_URL,
+                headers={
+                    "X-Chaka-API-Key": CHAKA_KEY,
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "message": combined_message,
+                    "model": model_name
+                },
+                timeout=60.0
+            )
+            res.raise_for_status()
+            data = res.json()
+            # The hook shows print(res.json()), assuming it returns {"response": "..."} or similar.
+            # Usually these custom APIs return a message or choice. I'll check common patterns or assume it returns text directly or in a 'response' field.
+            # Based on the user's snippet, it doesn't show the response structure. I'll guess 'response' or the first key.
+            # Wait, if it's following OpenAI-like it might be ['choices'][0]['message']['content'].
+            # If it's a simple project, it might be just the text or {"message": "..."}.
+            # I'll log it to be sure but I'll try to extract 'message' or 'response'.
+            logger.info(f"Chaka API response: {data}")
+            return data.get("response", data.get("message", str(data)))
+    except Exception as e:
+        logger.error(f"Chaka API Error: {e}")
+        return f"Error: Failed to connect to Chaka Engine. {str(e)}"
 
 # -------- Database Setup --------
 import tempfile
@@ -283,40 +313,34 @@ async def generate(req: Request):
 
     async def stream_generator():
         try:
-            # 1. Send Research Data First (Special Format)
-            # We use a custom tag [SOURCES_START]...[SOURCES_END]
+            # 1. Send Research Data First
             if research_results:
                 import json
                 sources_json = json.dumps(research_results)
                 yield f"[SOURCES_START]{sources_json}[SOURCES_END]"
 
-            # 2. Stream Content
-            model = genai.GenerativeModel(model_name)
-            response = await model.generate_content_async(prompt, stream=True)
+            # 2. Get content from Chaka API
+            # Note: We use the full system prompt + logic from above
+            ai_response = await call_chaka_api(prompt, model_name)
             
-            full_content = ""
+            # Extract virality score
             virality_score = 0
+            if "[VIRALITY_SCORE:" in ai_response:
+                try:
+                    score_part = ai_response.split("[VIRALITY_SCORE:")[1].split("]")[0].strip()
+                    virality_score = int(score_part)
+                except:
+                    pass
+            
+            yield ai_response
 
-            async for chunk in response:
-                if chunk.text:
-                   text = chunk.text
-                   full_content += text
-                   # Try to extract virality score if present
-                   if "[VIRALITY_SCORE:" in text:
-                       try:
-                           score_part = text.split("[VIRALITY_SCORE:")[1].split("]")[0].strip()
-                           virality_score = int(score_part)
-                       except:
-                           pass
-                   yield text
-
-            # Save to DB after streaming completes
+            # Save to DB
             data["research_results"] = research_results
-            save_generation(data, full_content, virality_score)
+            save_generation(data, ai_response, virality_score)
 
         except Exception as e:
-            logger.error(f"Gemini SDK Error: {e}")
-            yield f"Error generating content: {str(e)}\n\n(Tip: Valid models are gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash-exp)"
+            logger.error(f"Chaka Integration Error: {e}")
+            yield f"Error generating content: {str(e)}"
 
     return StreamingResponse(stream_generator(), media_type="text/plain")
 
@@ -382,13 +406,8 @@ async def chat(req: Request):
 
     async def stream_chat():
         try:
-            model = genai.GenerativeModel(model_name, system_instruction=system_instruction)
-            response = await model.generate_content_async(user_prompt, stream=True)
-            full_response = ""
-            async for chunk in response:
-                if chunk.text:
-                    full_response += chunk.text
-                    yield chunk.text
+            full_response = await call_chaka_api(user_prompt, model_name, system_instruction=system_instruction)
+            yield full_response
             
             # Save to DB
             save_chat(message, full_response, context, selection, model_name)

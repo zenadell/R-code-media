@@ -3,5 +3,5 @@ uvicorn
 python-dotenv
 httpx
 sse-starlette
-google-generativeai
+# google-generativeai
 requests
