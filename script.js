@@ -10,6 +10,7 @@ let themeSwitch = document.getElementById("themeSwitch");
 let currentSelectionRange = null;
 let userLocation = null;
 let locationWatchId = null;
+let selectedImageBase64 = null;
 
 // --- Sidebar/Menu Logic ---
 if (menuIcon && activeSource) {
@@ -143,6 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
     locationToggle.addEventListener('change', handleLocationToggle);
   }
 
+  // Image Upload Logic
+  const imageInput = document.getElementById('image-input');
+  const removeImageBtn = document.getElementById('remove-image-btn');
+
+  if (imageInput) imageInput.addEventListener('change', handleImageSelect);
+  if (removeImageBtn) removeImageBtn.addEventListener('click', clearImage);
+
   renderHistory();
 });
 
@@ -222,6 +230,26 @@ async function reverseGeocode(lat, lon) {
   return null;
 }
 
+function handleImageSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    selectedImageBase64 = event.target.result;
+    document.getElementById('image-preview').src = selectedImageBase64;
+    document.getElementById('image-preview-container').style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  selectedImageBase64 = null;
+  document.getElementById('image-input').value = "";
+  document.getElementById('image-preview').src = "";
+  document.getElementById('image-preview-container').style.display = 'none';
+}
+
 // --- Generation Logic ---
 async function generateStrategy() {
   const outputDiv = document.getElementById("output");
@@ -253,7 +281,11 @@ async function generateStrategy() {
     const response = await fetch(`${API_BASE}/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ company, focus, days, platform, model, length, user_location: userLocation })
+      body: JSON.stringify({
+        company, focus, days, platform, model, length,
+        user_location: userLocation,
+        image: selectedImageBase64
+      })
     });
 
     const reader = response.body.getReader();
@@ -348,7 +380,8 @@ async function sendChat(e) {
     message: message,
     context: context,
     selection: selectionText,
-    model: document.getElementById('model').value
+    model: document.getElementById('model').value,
+    image: selectedImageBase64
   };
 
   input.value = "Thinking...";

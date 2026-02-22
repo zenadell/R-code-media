@@ -23,7 +23,7 @@ CHAKA_URL = os.getenv("CHAKA_API_URL")
 CHAKA_KEY = os.getenv("CHAKA_API_KEY")
 TAVILY_KEY = os.getenv("TAVILY_API_KEY")
 
-async def call_chaka_api(message, model_name, system_instruction=None):
+async def call_chaka_api(message, model_name, system_instruction=None, image=None):
     if not CHAKA_URL or not CHAKA_KEY:
         logger.error("Chaka API config missing")
         return "Error: Chaka API configuration missing in .env"
@@ -41,7 +41,8 @@ async def call_chaka_api(message, model_name, system_instruction=None):
                 },
                 json={
                     "message": combined_message,
-                    "model": model_name
+                    "model": model_name,
+                    "image": image
                 },
                 timeout=60.0
             )
@@ -229,8 +230,9 @@ async def generate(req: Request):
     length = data.get("length", "Medium")
     platform = data.get("platform", "LinkedIn")
     user_location = data.get("user_location")
-    # Default to user requested model, let SDK handle errors if invalid
-    model_name = data.get("model", "gemini-2.5-flash")
+    image = data.get("image")
+    # Default to user requested model
+    model_name = data.get("model", "chaka-medium")
 
     # Perform research
     research_results = await web_research(f"{company} {platform} content strategy {focus}")
@@ -321,7 +323,7 @@ async def generate(req: Request):
 
             # 2. Get content from Chaka API
             # Note: We use the full system prompt + logic from above
-            ai_response = await call_chaka_api(prompt, model_name)
+            ai_response = await call_chaka_api(prompt, model_name, image=image)
             
             # Extract virality score
             virality_score = 0
@@ -352,7 +354,8 @@ async def chat(req: Request):
     context = data.get("context", "") # Current document text
     selection = data.get("selection", "") # Selected text to rework
     user_location = data.get("user_location")
-    model_name = data.get("model", "gemini-2.5-flash")
+    image = data.get("image")
+    model_name = data.get("model", "chaka-medium")
     
     logger.info(f"Chat request: {message[:50]}... | Selection: {bool(selection)}")
 
@@ -406,7 +409,7 @@ async def chat(req: Request):
 
     async def stream_chat():
         try:
-            full_response = await call_chaka_api(user_prompt, model_name, system_instruction=system_instruction)
+            full_response = await call_chaka_api(user_prompt, model_name, system_instruction=system_instruction, image=image)
             yield full_response
             
             # Save to DB
