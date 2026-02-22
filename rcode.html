@@ -120,18 +120,26 @@
                         <p>Configure your strategy on the left and initialize the engine.</p>
                     </div>
                 </div>
-                <div class="promptBar">
-                    <div id="image-preview-container" class="image-preview-container" style="display: none;">
+                <div class="promptBar"
+                    style="display: flex; flex-direction: column; gap: 10px; padding: 15px; background: var(--centre-color); border: 1px solid var(--border); border-radius: 12px; margin-top: 20px;">
+                    <div id="image-preview-container" class="image-preview-container"
+                        style="display: none; margin-bottom: 10px;">
                         <img id="image-preview" src="" alt="Preview">
                         <button type="button" id="remove-image-btn" class="remove-image-btn">&times;</button>
                     </div>
-                    <div class="prompt-input-wrapper">
+                    <div class="prompt-input-wrapper"
+                        style="display: flex !important; align-items: center !important; gap: 10px !important; width: 100% !important;">
                         <input type="file" id="image-input" accept="image/*" style="display: none;">
-                        <button type="button" id="image-upload-btn" class="image-upload-btn">
-                            <ion-icon name="image-outline"></ion-icon>
+                        <button type="button" id="image-upload-btn"
+                            style="height: 44px; width: 44px; min-width: 44px; display: flex; align-items: center; justify-content: center; background: var(--boxlet-color); border: 1px solid var(--border); color: var(--text-color); border-radius: 8px; cursor: pointer; flex-shrink: 0;">
+                            <ion-icon name="image"></ion-icon>
                         </button>
-                        <input type="text" id="chat-input" placeholder="Ask Chaka or select text to rework...">
-                        <button type="button" id="send-chat-btn"><ion-icon name="send-outline"></ion-icon></button>
+                        <input type="text" id="chat-input" placeholder="Ask Chaka or select text to rework..."
+                            style="flex: 1; height: 44px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 0 15px; color: var(--text-color); outline: none;">
+                        <button type="button" id="send-chat-btn"
+                            style="height: 44px; width: 44px; min-width: 44px; display: flex; align-items: center; justify-content: center; background: var(--btnColor); border: none; color: white; border-radius: 8px; cursor: pointer; flex-shrink: 0;">
+                            <ion-icon name="send"></ion-icon>
+                        </button>
                     </div>
                 </div>
                 <!-- Chat messages can be displayed in the output area or a separate hidden div -->
