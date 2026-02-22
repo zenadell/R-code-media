@@ -153,12 +153,7 @@ function handleLocationToggle(e) {
     if ("geolocation" in navigator) {
       statusDiv.innerText = "Requesting permission...";
       locationWatchId = navigator.geolocation.watchPosition(
-        (position) => {
-          userLocation = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
-          statusDiv.innerText = `Active: ${userLocation}`;
-          statusDiv.classList.add('active');
-          statusDiv.classList.remove('error');
-        },
+        handleLocationUpdate,
         (error) => {
           console.error("Location error:", error);
           userLocation = null;
@@ -182,6 +177,49 @@ function handleLocationToggle(e) {
     statusDiv.innerText = "Off";
     statusDiv.classList.remove('active', 'error');
   }
+}
+
+async function handleLocationUpdate(position) {
+  const statusDiv = document.getElementById('location-status');
+  const { latitude, longitude } = position.coords;
+
+  // Update with coordinates immediately as fallback
+  userLocation = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+  statusDiv.innerText = `Resolving address: ${userLocation}...`;
+
+  // Get human-readable address
+  const address = await reverseGeocode(latitude, longitude);
+  if (address) {
+    userLocation = address;
+    statusDiv.innerText = `Active: ${userLocation}`;
+  } else {
+    statusDiv.innerText = `Active: ${userLocation} (Address unavailable)`;
+  }
+  statusDiv.classList.add('active');
+  statusDiv.classList.remove('error');
+}
+
+async function reverseGeocode(lat, lon) {
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
+      headers: { 'Accept-Language': 'en' }
+    });
+    const data = await response.json();
+    if (data && data.address) {
+      const a = data.address;
+      // Extract precise parts: Village/Suburb, LGA/City District, State, Country
+      const precise = a.village || a.suburb || a.town || a.neighbourhood || a.road || "Unknown Area";
+      const lga = a.county || a.city_district || a.city || "Unknown LGA";
+      const state = a.state || "";
+      const country = a.country || "";
+
+      const parts = [precise, lga, state, country].filter(Boolean);
+      return parts.join(", ");
+    }
+  } catch (error) {
+    console.error("Reverse geocoding error:", error);
+  }
+  return null;
 }
 
 // --- Generation Logic ---
